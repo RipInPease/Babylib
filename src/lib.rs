@@ -7,7 +7,7 @@
 //}
 
 pub mod Vec2d {
-  pub fn new<T> (x: usize, y: usize, value: T) -> Vec<Vec<T>>
+  pub fn new<T> (x: usize, y: usize, value: T, test: usize) -> Vec<Vec<T>>
   where 
     T: Clone {
       vec![vec![value; y]; x]
