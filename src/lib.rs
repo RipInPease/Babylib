@@ -20,3 +20,9 @@ pub mod rng {
     max
   }
 }
+
+pub mod Vec2d {
+  pub fn new<T> (x: usize, y: usize) {
+
+  }
+}
