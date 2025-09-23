@@ -18,5 +18,34 @@ pub mod vec_2d {
             values: vec![vec![value.clone(); y]; x]
           }
       }
-  } 
+  }
+
+
+
+
+
+///////////////////////////////////
+/////// Trait implentations ///////
+///////////////////////////////////
+
+  use std::ops::Index;
+  use std::ops::IndexMut;
+
+
+  impl<T> Index<usize> for Vec2d<T> {
+    type Output = Vec<T>;
+
+    fn index(&self, index: usize) -> &Self::Output {
+      &self.values[index]
+    }
+  }
+
+  impl<T> IndexMut<usize> for Vec2d<T> {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+      &mut self.values[index]
+    }
+  }
 }
+
+
+
