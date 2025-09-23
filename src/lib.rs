@@ -1,16 +1,21 @@
-//pub mod rng {
-//  pub fn rand (min: u32, max: u32) -> u32 {
-//    use std::time::SystemTime;
-//    let sys_time = SystemTime::now();
-//    max
-//  }
-//}
+//Module for making 2d vectors less AIDS
+pub mod vec_2d {
+  struct Vec2d<T> {
+    values: Vec<Vec<T>>
+  }
 
-pub mod Vec2d {
-  pub fn new<T> (x: usize, y: usize, value: T) -> Vec<Vec<T>>
-  where 
-    T: Clone {
-      vec![vec![value; y]; x]
-    }
 
+  //Implementations for Vec2d
+  impl<T> Vec2d<T> {
+
+    //Creates a new 2d vector with given x and y dimensions and default value
+    fn new(x: usize, y: usize, value: T) -> Self 
+      where 
+      T: Clone {
+
+          Self{
+            values: vec![vec![value.clone(); y]; x]
+          }
+      }
+  } 
 }
