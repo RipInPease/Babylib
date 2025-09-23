@@ -1,6 +1,7 @@
 //Module for making 2d vectors less AIDS
 pub mod vec_2d {
-  struct Vec2d<T> {
+  #[derive(Debug, Clone)]
+  pub struct Vec2d<T> {
     values: Vec<Vec<T>>
   }
 
