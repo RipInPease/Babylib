@@ -10,7 +10,7 @@ pub mod vec_2d {
   impl<T> Vec2d<T> {
 
     //Creates a new 2d vector with given x and y dimensions and default value
-    fn new(x: usize, y: usize, value: T) -> Self 
+    pub fn new(x: usize, y: usize, value: T) -> Self 
       where 
       T: Clone {
 
