@@ -1,4 +1,4 @@
-
+mod iterators;
 use std::slice::Iter;
 
 
@@ -12,13 +12,6 @@ pub struct Vec2d<T> {
 ////// Methods and function ///////
 ///////////////////////////////////
 impl<T> Vec2d<T> {
-
-    ///Iterates over all columns
-    
-    pub fn iter(&self) -> Iter<'_, Vec<T>> {
-    self.values.iter()
-    }
-
 
     ///Creates a new 2d vector with given column and row dimensions and default value
 
@@ -48,7 +41,30 @@ impl<T> Vec2d<T> {
     /// Panics if the new capacity exceeds `isize::MAX` _bytes_.
 
     pub fn push(&mut self, value: Vec<T>) {
-    self.values.push(value);
+        self.values.push(value);
+    }
+
+
+    ///Iterates over all columns
+
+    pub fn iter(&self) -> Iter<'_, Vec<T>> {
+        self.values.iter()
+    }
+
+
+
+    ///Consumes the 2d vector and returns an iterator over the columns
+    
+    pub fn into_iter(self) -> iterators::IntoIter<T> {
+        let max = self.values.len();
+        let current = 0;
+        let values = self.values;
+
+        iterators::IntoIter {
+            values: values,
+            current: current,
+            max: max
+        }
     }
 }
 
@@ -61,7 +77,6 @@ impl<T> Vec2d<T> {
 ///////////////////////////////////
 use std::ops::Index;
 use std::ops::IndexMut;
-mod iterators;
 
 
 impl<T> Index<usize> for Vec2d<T> {
