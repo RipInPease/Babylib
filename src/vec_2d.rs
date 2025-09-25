@@ -1,5 +1,4 @@
 mod iterators;
-use std::slice::Iter;
 
 
 #[derive(Debug, Clone)]
@@ -42,29 +41,6 @@ impl<T> Vec2d<T> {
 
     pub fn push(&mut self, value: Vec<T>) {
         self.values.push(value);
-    }
-
-
-    ///Iterates over all columns
-
-    pub fn iter(&self) -> Iter<'_, Vec<T>> {
-        self.values.iter()
-    }
-
-
-
-    ///Consumes the 2d vector and returns an iterator over the columns
-    
-    pub fn into_iter(self) -> iterators::IntoIter<T> {
-        let max = self.values.len();
-        let current = 0;
-        let values = self.values;
-
-        iterators::IntoIter {
-            values: values,
-            current: current,
-            max: max
-        }
     }
 }
 
