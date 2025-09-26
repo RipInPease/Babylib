@@ -12,7 +12,7 @@ pub struct Vec2d<T> {
 ///////////////////////////////////
 impl<T> Vec2d<T> {
 
-    ///Creates a new 2d vector with given column and row dimensions and default value
+    /// Creates a new 2d vector with given column and row dimensions and default value
 
     pub fn new(col: usize, row: usize, value: T) -> Self 
     where 
@@ -25,7 +25,7 @@ impl<T> Vec2d<T> {
 
     
 
-    ///Removes last value and returns a reference it
+    /// Removes last value and returns a reference it
 
     pub fn pop(&mut self) -> Option<Vec<T>> {
     self.values.pop()
