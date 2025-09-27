@@ -1,4 +1,4 @@
-mod iterators;
+pub mod iterators;
 
 
 #[derive(Debug, Clone)]

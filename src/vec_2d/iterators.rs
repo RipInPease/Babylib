@@ -4,7 +4,7 @@ use std::slice::Iter;
 use std::num::NonZero;
 
 
-/// A consuming iterator that returns a vector of all columns 'vec2d[column][row]'
+/// A consuming iterator that returns a vector of all columns `vec2d[column][row]`
 
 #[derive(Debug, Clone)]
 pub struct IntoIter<T> {
@@ -33,7 +33,7 @@ impl<T: Clone> Iterator for IntoIter<T> {
 
 
 
-/// An iterator that iterates over all values in each row 'vec2d[column][row]'
+/// An iterator that iterates over all values in each row `vec2d[column][row]`
 /// before continuing to the next row
 
 #[derive(Debug, Clone)]
@@ -69,7 +69,7 @@ impl<'a, T: 'a > Iterator for IterByRow<'a, T> {
 
 
 
-/// An iterator that iterates over all values in each column 'vec2d[column][row]' 
+/// An iterator that iterates over all values in each column `vec2d[column][row]`
 /// before continuing to the next row
 
 #[derive(Debug, Clone)]
@@ -96,6 +96,52 @@ impl<'a, T: 'a> Iterator for IterByCol<'a, T> {
         if self.curr_row >= self.max_row {
             self.curr_col += 1;
             self.curr_row = 0;
+        }
+
+        Some(ret)
+    }
+}
+
+
+
+
+/// Iterator over all the adjacent coordinates given a range
+/// 
+/// Given range `1` it will give an iterator of a 3x3 grid
+/// because it goes `1` in each direction from the start cell
+/// 
+/// Start from the upper left corner and goes right and then down
+/// to the lower right corner:
+
+pub struct Neighbors<'a, T: 'a> {
+    values: &'a Vec<Vec<T>>,
+    range: usize,
+    start_col: usize,
+    start_row: usize,
+    curr_col: usize,
+    curr_row: usize,
+}
+
+
+impl<'a, T: 'a> Iterator for Neighbors<'a, T> {
+    type Item = Option<&'a T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.curr_row > self.start_row + self.range+1 {
+            return None;
+        }
+        
+        let ret = 
+            if let Some(col) = self.values.get(self.curr_col) {
+                col.get(self.curr_row)
+            } else {
+                None
+        };
+
+        self.curr_col += 1;
+        if self.curr_col > self.start_col + self.range+1 {
+            self.curr_col = 0;
+            self.curr_row += 1;
         }
 
         Some(ret)
@@ -158,7 +204,7 @@ impl<T> super::Vec2d<T> {
 
     /// Iterates over the 2d vector row by row instead of column by column.
     /// Will first iterate over all values in the first row, then the next and so on
-    /// Returns and Option<T> of the matrix coordinate, None if if it empty
+    /// Returns and `Option<T>` of the matrix coordinate, None if if it empty
     
     pub fn iter_by_row(&self) -> IterByRow<'_, T> {
         IterByRow {
@@ -173,7 +219,7 @@ impl<T> super::Vec2d<T> {
 
 
 
-    /// Iterates over the all rows in a column '2dvec[column][row]
+    /// Iterates over the all rows in a column `2dvec[column][row]`
     /// before continuing to next column
     
     pub fn iter_by_col(&self) -> IterByCol<'_, T> {
@@ -185,6 +231,25 @@ impl<T> super::Vec2d<T> {
             max_cols: self.values.len()
         }
     }
+
+
+
+
+    /// An iterator that iterates over all adjecent cells in the grid
+    /// given a `range`
+    /// Given a `range` of _1_, will iterate over a 3x3 area. It goes
+    /// _1_ in each direction from `start_pos`
+
+    pub fn neighbors(&self, range: usize, start_pos: (usize, usize)) -> Neighbors<'_, T> {
+        Neighbors {
+            values: &self.values,
+            range: range, 
+            start_col: start_pos.0,
+            start_row: start_pos.1,
+            curr_col: 0,
+            curr_row: 0
+        }
+    } 
 
 
 
