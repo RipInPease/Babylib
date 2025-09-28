@@ -115,11 +115,11 @@ impl<'a, T: 'a> Iterator for IterByCol<'a, T> {
 
 pub struct Neighbors<'a, T: 'a> {
     values: &'a Vec<Vec<T>>,
-    range: usize,
-    start_col: usize,
-    start_row: usize,
-    curr_col: usize,
-    curr_row: usize,
+    range: i32,
+    start_col: i32,
+    start_row: i32,
+    col_offset: i32,
+    row_offset: i32,
 }
 
 
@@ -127,21 +127,30 @@ impl<'a, T: 'a> Iterator for Neighbors<'a, T> {
     type Item = Option<&'a T>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.curr_row > self.start_row + self.range+1 {
-            return None;
+        if self.row_offset > self.range {
+            return None
         }
-        
-        let ret = 
-            if let Some(col) = self.values.get(self.curr_col) {
-                col.get(self.curr_row)
-            } else {
+
+        let col_to_get = self.start_col + self.col_offset;
+        let row_to_get = self.start_row + self.row_offset;
+
+        let ret = {
+            if col_to_get < 0 || row_to_get < 0 {
                 None
+            } else {
+                if let Some(col) = self.values.get(col_to_get as usize) {
+                    col.get(row_to_get as usize)
+                } else {
+                    None
+                }
+            }
         };
 
-        self.curr_col += 1;
-        if self.curr_col > self.start_col + self.range+1 {
-            self.curr_col = 0;
-            self.curr_row += 1;
+
+        self.col_offset += 1;
+        if self.col_offset > self.range {
+            self.row_offset += 1;
+            self.col_offset = -self.range;
         }
 
         Some(ret)
@@ -243,11 +252,11 @@ impl<T> super::Vec2d<T> {
     pub fn neighbors(&self, range: usize, start_pos: (usize, usize)) -> Neighbors<'_, T> {
         Neighbors {
             values: &self.values,
-            range: range, 
-            start_col: start_pos.0,
-            start_row: start_pos.1,
-            curr_col: 0,
-            curr_row: 0
+            range: range as i32, 
+            start_col: start_pos.0 as i32,
+            start_row: start_pos.1 as i32,
+            col_offset: -(range as i32),
+            row_offset: -(range as i32)
         }
     } 
 
