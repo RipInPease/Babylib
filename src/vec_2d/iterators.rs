@@ -1,3 +1,7 @@
+use core::marker::PhantomData;
+
+
+
 /// Module for iterators of the struct Vec2d
 
 use std::slice::Iter;
@@ -160,6 +164,56 @@ impl<'a, T: 'a> Iterator for Neighbors<'a, T> {
 
 
 
+/// Gives adjacent coordiantes as a mutable reference
+
+pub struct NeighborsMut<'a, T: 'a> {
+    values: *mut Vec<Vec<T>>,
+    range: i32,
+    start_col: i32,
+    start_row: i32,
+    col_offset: i32,
+    row_offset: i32,
+    _marker: PhantomData<&'a mut Vec<Vec<T>>>
+}
+
+
+impl<'a, T: 'a> Iterator for NeighborsMut<'a, T> {
+    type Item = Option<&'a mut T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.row_offset > self.range {
+            return None
+        }
+
+        let values = unsafe { &mut *self.values };
+
+        let col_to_get = self.start_col + self.col_offset;
+        let row_to_get = self.start_row + self.row_offset;
+
+        let ret = {
+            if col_to_get < 0 || row_to_get < 0 {
+                None
+            } else {
+                if let Some(col) = values.get_mut(col_to_get as usize) {
+                    col.get_mut(row_to_get as usize)
+                } else {
+                    None
+                }
+            }
+        };
+
+
+        self.col_offset += 1;
+        if self.col_offset > self.range {
+            self.row_offset += 1;
+            self.col_offset = -self.range;
+        }
+
+        Some(ret)
+    }
+}
+
+
 /// An iterator over overlapping subslices of length `size`.
 
 #[derive(Debug, Clone)]
@@ -258,7 +312,28 @@ impl<T> super::Vec2d<T> {
             col_offset: -(range as i32),
             row_offset: -(range as i32)
         }
-    } 
+    }
+
+
+
+
+    /// An iterator that iterates over all adjecent cells in the grid
+    /// given a `range`, returns a mutable reference to the cell
+    /// 
+    /// Given a `range` of _1_, will iterate over a 3x3 area. It goes
+    /// _1_ in each direction from `start_pos`
+
+    pub fn neighbors_mut(&mut self, range: usize, start_pos: (usize, usize)) -> NeighborsMut<'_, T> {
+        NeighborsMut {
+            values: &mut self.values,
+            range: range as i32, 
+            start_col: start_pos.0 as i32,
+            start_row: start_pos.1 as i32,
+            col_offset: -(range as i32),
+            row_offset: -(range as i32),
+            _marker: PhantomData
+        }
+    }
 
 
 
