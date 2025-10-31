@@ -1,11 +1,11 @@
-use std::time::{Duration, SystemTime};
+use std::time::{Duration, Instant};
 use crate::timer::Timer;
 /// Timer on. 
 /// Output high when elapsed time is greater or equal to set time. 
 /// 
 #[derive(Debug, Clone)]
 pub struct Ton {
-    start_time  : SystemTime,
+    start_time  : Instant,
     set_time    : Duration,
     enabled     : bool,
 }
@@ -16,7 +16,7 @@ impl Ton {
     /// 
     pub fn new(set_time: Duration) -> Self {
         Self{
-            start_time: SystemTime::now(),
+            start_time: Instant::now(),
             set_time,
             enabled: false,
         }
@@ -27,7 +27,7 @@ impl Ton {
     /// 
     pub fn new_enabled(set_time: Duration) -> Self {
         Self{
-            start_time: SystemTime::now(),
+            start_time: Instant::now(),
             set_time,
             enabled: true,
         }
@@ -45,7 +45,7 @@ impl Timer for Ton {
     fn q(&self) -> bool {
         if !self.enabled {return false}
         
-        if SystemTime::now().duration_since(self.start_time).unwrap() >= self.set_time {
+        if Instant::now().duration_since(self.start_time) >= self.set_time {
             true
         } else {
             false
@@ -59,7 +59,7 @@ impl Timer for Ton {
         }
 
         if !self.enabled {
-            self.start_time = SystemTime::now();
+            self.start_time = Instant::now();
         } 
         self.enabled = status;
     }
@@ -67,7 +67,7 @@ impl Timer for Ton {
     fn et(&self) -> Option<Duration> {
         if !self.enabled {return None}
 
-        let et = SystemTime::now().duration_since(self.start_time).unwrap();
+        let et = Instant::now().duration_since(self.start_time);
         Some(et)
     }
 
