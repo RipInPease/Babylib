@@ -49,7 +49,4 @@ pub trait Timer {
     /// Sets the status of the input. On reset, elapsed time is reset
     /// 
     fn set_status(&mut self, status: bool);
-
-
-    // this is a test
 }
