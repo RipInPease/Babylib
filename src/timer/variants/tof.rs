@@ -1,17 +1,18 @@
 use std::time::{Duration, Instant};
 use crate::timer::Timer;
-/// Timer on. 
-/// Output high when elapsed time is greater or equal to set time. 
+
+/// Off timer. When the enable signal goes low, the output is high for set duration
 /// 
-#[derive(Debug, Clone)]
-pub struct Ton {
+pub struct Tof {
     start_time  : Instant,
     set_time    : Duration,
     enabled     : bool,
+    gone_high   : bool,
+    gone_low    : bool,
 }
 
 
-impl Ton {
+impl Tof {
 
     /// Creates a new disabled instance of timer
     /// 
@@ -20,6 +21,8 @@ impl Ton {
             start_time: Instant::now(),
             set_time,
             enabled: false,
+            gone_high: false,
+            gone_low: false
         }
     }
 
@@ -31,6 +34,8 @@ impl Ton {
             start_time: Instant::now(),
             set_time,
             enabled: true,
+            gone_high: false,
+            gone_low: false
         }
     }
 
@@ -43,11 +48,11 @@ impl Ton {
 }
 
 
-impl Timer for Ton {
+impl Timer for Tof {
     fn q(&self) -> bool {
-        if !self.enabled {return false}
-        
-        if Instant::now().duration_since(self.start_time) >= self.set_time {
+        if !self.gone_low {return false}
+
+        if self.start_time.elapsed() <= self.set_time {
             true
         } else {
             false
@@ -55,29 +60,21 @@ impl Timer for Ton {
     }
 
     fn set_status(&mut self, status: bool) {
-        if !status {
-            self.enabled = status;
-            return;
-        }
-
-        if !self.enabled {
-            self.start_time = Instant::now();
-        } 
+        let prev_state = self.enabled;
         self.enabled = status;
+
+        if status {
+            self.gone_high = true;
+        } else if self.gone_high {
+            self.gone_low = true;
+        }
+        
+        if !prev_state && prev_state {
+            self.start_time = Instant::now();
+        }
     }
 
     fn et(&self) -> Option<Duration> {
-        if !self.enabled {return None}
-
-        let et = Instant::now().duration_since(self.start_time);
-        Some(et)
-    }
-
-    fn time_remain(&self) -> Option<Duration> {
-        if self.q() || !self.enabled {
-            return None
-        }
-
-        Some(self.set_time - self.et()?)
+        todo!()
     }
 }
